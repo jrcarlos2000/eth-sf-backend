@@ -5,6 +5,7 @@
     "@skalenetwork/filestorage.js": "~1.0.0",
     "@zk-kit/identity": "^1.4.1",
     "@zk-kit/protocols": "^1.11.0",
+    "axios": "^1.1.3",
     "bignumber.js": "^9.1.0",
     "circomlibjs": "0.0.8",
     "cors": "^2.8.5",

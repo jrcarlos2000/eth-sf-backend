@@ -433,6 +433,11 @@ export const JomTxABI = [
     "type": "error"
   },
   {
+    "inputs": [],
+    "name": "UserVerified",
+    "type": "error"
+  },
+  {
     "anonymous": false,
     "inputs": [
       {
@@ -452,16 +457,60 @@ export const JomTxABI = [
         "internalType": "address",
         "name": "buyer_addr",
         "type": "address"
+      },
+      {
+        "indexed": false,
+        "internalType": "string",
+        "name": "detail",
+        "type": "string"
       }
     ],
     "name": "transactionSubmitted",
     "type": "event"
   },
   {
+    "inputs": [],
+    "name": "getCurrGroupId",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "getWorldIDAddr",
+    "outputs": [
+      {
+        "internalType": "address",
+        "name": "",
+        "type": "address"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "incrementGroupIds",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
     "inputs": [
       {
         "internalType": "string",
         "name": "ipfs_uri",
+        "type": "string"
+      },
+      {
+        "internalType": "string",
+        "name": "detail",
         "type": "string"
       },
       {
@@ -498,6 +547,11 @@ export const JomTxABI = [
         "type": "string"
       },
       {
+        "internalType": "string",
+        "name": "detail",
+        "type": "string"
+      },
+      {
         "internalType": "address",
         "name": "buyer_addr",
         "type": "address"
@@ -524,6 +578,34 @@ export const JomTxABI = [
       }
     ],
     "name": "submitVerifiedTx",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "callerAddr",
+        "type": "address"
+      },
+      {
+        "internalType": "uint256",
+        "name": "root",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "nullifierHash",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256[8]",
+        "name": "proof",
+        "type": "uint256[8]"
+      }
+    ],
+    "name": "verifyUser",
     "outputs": [],
     "stateMutability": "nonpayable",
     "type": "function"
