@@ -73,6 +73,10 @@ app.get("/tokens", async (req: Request, res: Response) => {
   res.send(result);
 });
 
+app.get("/whatever", async (req: Request, res: Response) => {
+  res.status(200).end();
+});
+
 //body.receiptData
 //body.storeKey -- identity commitment
 //body.storeName
