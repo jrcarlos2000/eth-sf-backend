@@ -29,10 +29,21 @@ import { getAddress, solidityPack } from  'ethers/lib/utils'
 
 const cors = require("cors");
 
-const corsOptions = {
-  origin: "http://localhost:3000",
-  optionsSuccessStatus: 200,
-};
+var whitelist = ["http://localhost:3000", "https://trustore-ethsf.vercel.app"]
+var corsOptions = {
+  origin: function (origin : any, callback : any) {
+    if (whitelist.indexOf(origin) !== -1) {
+      callback(null, true)
+    } else {
+      callback(new Error('Not allowed by CORS'))
+    }
+  }
+}
+
+// const corsOptions = {
+//   origin: "http://localhost:3000",
+//   optionsSuccessStatus: 200,
+// };
 const winston = require("winston");
 const consoleTransport = new winston.transports.Console();
 dotenv.config();
