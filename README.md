@@ -1,4 +1,4 @@
-# JomTx - Backend
+# TruStore - Backend
 JomTx backend handles proof generation and data retrieval for JomTx protocol. It provides an API that allows non-crypto users to generate receipts while storing data on a decentralized graph-node.
 
 [click to seee the contract repo]('https://github.com/jrcarlos2000/eth-sf-contracts')
