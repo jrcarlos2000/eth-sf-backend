@@ -620,11 +620,6 @@ export const JomTxABI = [
       },
       {
         "internalType": "uint256",
-        "name": "groupIdd",
-        "type": "uint256"
-      },
-      {
-        "internalType": "uint256",
         "name": "nullifierHash",
         "type": "uint256"
       },
@@ -645,11 +640,6 @@ export const JomTxABI = [
         "internalType": "address",
         "name": "callerAddr",
         "type": "address"
-      },
-      {
-        "internalType": "uint256",
-        "name": "groupIdd",
-        "type": "uint256"
       },
       {
         "internalType": "uint256",

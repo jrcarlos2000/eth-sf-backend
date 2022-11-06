@@ -187,7 +187,7 @@ app.post("/submit-receipt-v1", async (req: Request, res: Response) => {
 
 app.post("/generate-tax-declaration", async (req :Request , res : Response)=> {
   const {userAddr, userKey, userSignal, country, userName, chainId} = req.body;
-  const [nullifierHash, proof] = await getProof(actionID, solidityPack(["uint256"],[userSignal]), userKey);
+  const [nullifierHash, proof] = await getProof(actionID, solidityPack(["uint256"],[userSignal]), userAddr);
 
   try {
 
@@ -205,16 +205,17 @@ app.post("/generate-tax-declaration", async (req :Request , res : Response)=> {
 
     let tx = await cJomTx.verifyForTaxDeclaration(
       userAddr,
-      userSignal,
       await cMockWorldID.getRoot(userSignal),
       nullifierHash,
       proof
     )
 
+    await tx.wait();
+
     //generate statement tables
 
     const response = await axios({
-      url: 'https://api.thegraph.com/subgraphs/name/jrcarlos2000/miamipolygon',
+      url: 'http://178.62.219.64:8000/subgraphs/name/skale-eth-sf',
       method: 'post',
       data: {
         query: `
@@ -266,6 +267,7 @@ app.post("/get-store-transactions", async (req :Request , res : Response)=> {
           StoreNullifier
           ipfsURI
           detail
+          buyerAddr
         }
       }
         `
@@ -355,7 +357,6 @@ app.post("/verify-worldcoin-dev-user", async (req: Request, res: Response) => {
 
     const tx4 = await cJomTx.verifyUser(
       userAddr,
-      // currGroupId,
       await cMockWorldID.getRoot(currGroupId),
       nullifierHash,
       proof
