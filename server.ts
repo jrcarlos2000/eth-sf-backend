@@ -97,6 +97,9 @@ app.post("/submit-receipt-v1", async (req: Request, res: Response) => {
     storeToWeb3Storage(pdfFileName),
   ]);
 
+  let tmpTxSummary = transactionSummary || "Default-Purchase";
+  tmpTxSummary +=  `_${receiptData.total}`
+  tmpTxSummary +=  `_${receiptData.currency}`
   // const cids = ["hola"];
 
   if(!buyerAddr) {
@@ -121,17 +124,21 @@ app.post("/submit-receipt-v1", async (req: Request, res: Response) => {
 
       let tx = await cJomTx.submitNonVerifiedUserTx(
         cids[0],
-        transactionSummary || "Default-Purchase",
+        tmpTxSummary,
         storeSignal,
         await cMockWorldID.getRoot(storeSignal),
         nullifierHash,
         proof
       )
 
+      console.log(tx);
+
       await tx.wait();
 
       res.send({
-        "web3.storage cid:": cids[0],
+        "uri": cids[0],
+        "hash" : tx.hash,
+        "detail" : tmpTxSummary,
       });
 
       res.status(200).end();
@@ -160,7 +167,7 @@ app.post("/submit-receipt-v1", async (req: Request, res: Response) => {
       console.log("here done", cJomTx);
       let tx = await cJomTx.submitVerifiedTx(
         cids[0],
-        transactionSummary || "Default-Purchase",
+        tmpTxSummary,
         getAddress(buyerAddr),
         storeSignal,
         await cMockWorldID.getRoot(storeSignal),
@@ -173,7 +180,9 @@ app.post("/submit-receipt-v1", async (req: Request, res: Response) => {
       await tx.wait();
 
       res.send({
-        "web3.storage cid:": cids[0],
+        "uri": cids[0],
+        "hash" : tx.hash,
+        "detail" : tmpTxSummary,
       });
       res.status(200).end();
 
@@ -187,7 +196,7 @@ app.post("/submit-receipt-v1", async (req: Request, res: Response) => {
 
 app.post("/generate-tax-declaration", async (req :Request , res : Response)=> {
   const {userAddr, userKey, userSignal, country, userName, chainId} = req.body;
-  const [nullifierHash, proof] = await getProof(actionID, solidityPack(["uint256"],[userSignal]), userAddr);
+  const [nullifierHash, proof] = await getProof(actionID, solidityPack(["address"],[userAddr]), userAddr);
 
   try {
 
@@ -233,9 +242,9 @@ app.post("/generate-tax-declaration", async (req :Request , res : Response)=> {
 
     
     let txList = response.data.data.transactions;
-    txList = txList.filter((item:any ) => {return item.buyerAddr == userAddr})
+    txList = txList.filter((item:any ) => {return item.buyerAddr.toLowerCase() == userAddr.toLowerCase()})
 
-
+    console.log(txList);
     const receiptTable = await buildTaxDeclaration(txList);
     const pdfFileName = "output.pdf";
     await createTaxPDF ([receiptTable] , userAddr, userName, country, userSignal, pdfFileName);
@@ -244,6 +253,11 @@ app.post("/generate-tax-declaration", async (req :Request , res : Response)=> {
     const cids = await awaitAndFilter([
       storeToWeb3Storage(pdfFileName),
     ]);
+
+    res.send({
+      "web3.storage cid:": cids[0],
+    });
+    res.status(200).end();
 
   }catch (error :any){
     console.error(error)
@@ -364,7 +378,7 @@ app.post("/verify-worldcoin-dev-user", async (req: Request, res: Response) => {
     await tx4.wait();
 
     res.send({
-      "userID": currGroupId,
+      "userID": currGroupId.toNumber(),
     });
     res.status(200).end();
   } catch (error: any) {
@@ -410,7 +424,7 @@ app.post("/verify-worldcoin-dev", async (req: Request, res: Response) => {
     await tx2.wait();
     
     res.send({
-      "storeID": currGroupId,
+      "storeID": currGroupId.toNumber(),
     });
     res.status(200).end();
   } catch (error: any) {

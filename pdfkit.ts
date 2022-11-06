@@ -1,10 +1,5 @@
 import PDFDocument from "pdfkit-table";
 import fs from "fs";
-import { fetchAllTokenBalancesForAllAccounts, fetchAllTokenTransactionsForAllAccounts } from "./etherscan"
-import BigNumber from "bignumber.js";
-import { fetchTokenPriceBsc } from "./coingecko"
-import { awaitAndFilter } from "./utils"
-import { symbolToAddress } from "./constants"
 
 async function createPDF(
   tables: any[],
@@ -114,14 +109,18 @@ async function buildTaxDeclaration(txlist : any) {
   let parsed: any[][] = [];
 
   for(let i=0; i<txlist.length ; i++){
-    parsed.push([txlist[i].detail])
+    const temp = txlist[i].detail.split("_");
+    parsed.push([temp[0],temp[1] || "NaN",temp[2] || "ETH", "OK"])
   }
   // parsed.push(["total", `1`, `${data.total} ${data.currency}`])
 
   const table = { 
-    title: 'List of Transactions in November',
+    title: 'List of Transactions in November 2022',
     headers: [
       { label: 'detail', property: 'detail', width:100},
+      { label: 'amount', property: 'amount', width:100},
+      { label: 'currency', property: 'curreny', width:70},
+      { label: 'status', property: 'status', width:70},
     ],
     rows: parsed,
   };
