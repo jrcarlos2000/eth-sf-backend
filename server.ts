@@ -25,7 +25,7 @@ import { Identity } from "@semaphore-protocol/identity";
 import { generateProof, packToSolidityProof } from "@semaphore-protocol/proof";
 import  { ZkIdentity, Strategy } from  "@zk-kit/identity";
 import { actionID, getProof } from "./utils/proof";
-import { solidityPack } from  'ethers/lib/utils'
+import { getAddress, solidityPack } from  'ethers/lib/utils'
 
 const cors = require("cors");
 
@@ -157,16 +157,18 @@ app.post("/submit-receipt-v1", async (req: Request, res: Response) => {
         JomTxABI,
         new Wallet(ethereumPrivateKey!, serverProviders[chainId])
       );
-
+      console.log("here done", cJomTx);
       let tx = await cJomTx.submitVerifiedTx(
         cids[0],
-        transactionSummary,
-        buyerAddr,
+        transactionSummary || "Default-Purchase",
+        getAddress(buyerAddr),
         storeSignal,
         await cMockWorldID.getRoot(storeSignal),
         nullifierHash,
         proof
-      )
+      );
+
+      console.log("here done2");
 
       await tx.wait();
 
@@ -254,7 +256,7 @@ app.post("/get-store-transactions", async (req :Request , res : Response)=> {
   const [nullifierHash, proof] = await getProof(actionID, solidityPack(["uint256"],[storeSignal]), storeKey);
   
   const response = await axios({
-    url: 'https://api.thegraph.com/subgraphs/name/jrcarlos2000/miamipolygon',
+    url: 'http://178.62.219.64:8000/subgraphs/name/skale-eth-sf',
     method: 'post',
     data: {
       query: `
@@ -271,7 +273,7 @@ app.post("/get-store-transactions", async (req :Request , res : Response)=> {
   })
 
   
-  let txList = response.data.data.transactions;
+  let txList = response.data.data? response.data.data.transactions : [];
   txList = txList.filter((item:any ) => {return item.StoreNullifier == nullifierHash})
 
   res.send({
@@ -285,7 +287,7 @@ app.post("/get-user-transactions", async (req :Request , res : Response)=> {
   const {buyerAddr, buyerName, chainId} = req.body;
 
   const response = await axios({
-    url: 'https://api.thegraph.com/subgraphs/name/jrcarlos2000/miamipolygon',
+    url: 'http://178.62.219.64:8000/subgraphs/name/skale-eth-sf',
     method: 'post',
     data: {
       query: `
@@ -301,9 +303,10 @@ app.post("/get-user-transactions", async (req :Request , res : Response)=> {
     }
   })
 
-  
-  let txList = response.data.data.transactions;
-  txList = txList.filter((item:any ) => {return item.buyerAddr == buyerAddr})
+  console.log(buyerAddr);
+  let txList = response.data.data? response.data.data.transactions : [];
+  console.log(txList);
+  txList = txList.filter((item:any ) => {return item.buyerAddr.toLowerCase() == buyerAddr.toLowerCase()})
 
   res.send({
     "transactions": txList,
@@ -312,10 +315,9 @@ app.post("/get-user-transactions", async (req :Request , res : Response)=> {
 
 })
 
-app.post("/verify-user-app", async (req: Request, res: Response) => {
-  const { storeKey , chainId} = req.body;
-  console.log("debugging : ", storeKey, chainId);
-  const identity = new ZkIdentity(Strategy.MESSAGE, storeKey);
+app.post("/verify-worldcoin-dev-user", async (req: Request, res: Response) => {
+  const { userAddr , chainId} = req.body;
+  const identity = new ZkIdentity(Strategy.MESSAGE, userAddr);
   try {
 
     let cMockWorldID = new Contract(
@@ -328,18 +330,41 @@ app.post("/verify-user-app", async (req: Request, res: Response) => {
       JomTxABI,
       new Wallet(ethereumPrivateKey!, serverProviders[chainId])
     );
+
+    //operations
+
+    const currGroupId = await cJomTx.getCurrGroupId();
+
     const tx1 = await cMockWorldID.addMember(
-      await cJomTx.getCurrGroupId(),
+      currGroupId,
       identity.genIdentityCommitment()
     );
 
     await tx1.wait();
 
+    const tx3 = await cJomTx.incrementGroupIds();
+    await tx3.wait();
+
     const tx2 = await cMockWorldID.createGroup(
-      await cJomTx.getCurrGroupId() + 1,
+      currGroupId + 1,
       20
     );
     await tx2.wait();
+
+    const [nullifierHash, proof] = await getProof(actionID, solidityPack(["address"],[userAddr]), userAddr);
+
+    const tx4 = await cJomTx.verifyUser(
+      userAddr,
+      // currGroupId,
+      await cMockWorldID.getRoot(currGroupId),
+      nullifierHash,
+      proof
+    )
+    await tx4.wait();
+
+    res.send({
+      "userID": currGroupId,
+    });
     res.status(200).end();
   } catch (error: any) {
     console.error(error);

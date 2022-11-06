@@ -434,6 +434,11 @@ export const JomTxABI = [
   },
   {
     "inputs": [],
+    "name": "UserNotVerified",
+    "type": "error"
+  },
+  {
+    "inputs": [],
     "name": "UserVerified",
     "type": "error"
   },
@@ -504,6 +509,25 @@ export const JomTxABI = [
   {
     "inputs": [
       {
+        "internalType": "address",
+        "name": "",
+        "type": "address"
+      }
+    ],
+    "name": "registeredUser",
+    "outputs": [
+      {
+        "internalType": "bool",
+        "name": "",
+        "type": "bool"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
         "internalType": "string",
         "name": "ipfs_uri",
         "type": "string"
@@ -557,9 +581,9 @@ export const JomTxABI = [
         "type": "address"
       },
       {
-        "internalType": "address",
+        "internalType": "uint256",
         "name": "storeSignal",
-        "type": "address"
+        "type": "uint256"
       },
       {
         "internalType": "uint256",
@@ -588,6 +612,44 @@ export const JomTxABI = [
         "internalType": "address",
         "name": "callerAddr",
         "type": "address"
+      },
+      {
+        "internalType": "uint256",
+        "name": "root",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "groupIdd",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "nullifierHash",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256[8]",
+        "name": "proof",
+        "type": "uint256[8]"
+      }
+    ],
+    "name": "verifyForTaxDeclaration",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "callerAddr",
+        "type": "address"
+      },
+      {
+        "internalType": "uint256",
+        "name": "groupIdd",
+        "type": "uint256"
       },
       {
         "internalType": "uint256",
