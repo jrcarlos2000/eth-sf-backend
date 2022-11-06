@@ -234,6 +234,7 @@ app.post("/generate-tax-declaration", async (req :Request , res : Response)=> {
             buyerAddr
             ipfsURI
             detail
+            time
           }
         }
           `
@@ -255,7 +256,7 @@ app.post("/generate-tax-declaration", async (req :Request , res : Response)=> {
     ]);
 
     res.send({
-      "web3.storage cid:": cids[0],
+      "uri": cids[0],
     });
     res.status(200).end();
 
@@ -282,6 +283,7 @@ app.post("/get-store-transactions", async (req :Request , res : Response)=> {
           ipfsURI
           detail
           buyerAddr
+          time
         }
       }
         `
@@ -313,6 +315,7 @@ app.post("/get-user-transactions", async (req :Request , res : Response)=> {
           ipfsURI
           buyerAddr
           detail
+          time
         }
       }
         `
